@@ -28,11 +28,13 @@ public:
     // Account Management
     void createCheckingAccount(int clientId, double initialBalance, double limit);
     void createSavingsAccount(int clientId, double initialBalance, double rate);
+    void displayAllAccounts() const;
     
     // Financial Operations
     Account* getAccount(const std::string& accountNumber);
     void depositToAccount(const std::string& accountNumber, double amount);
     void withdrawFromAccount(const std::string& accountNumber, double amount);
+    void transfer(const std::string& fromAccount, const std::string& toAccount, double amount);
 };
 
 #endif // BANK_H

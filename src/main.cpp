@@ -8,8 +8,10 @@ void displayMenu() {
     std::cout << "2. Admin: View All Clients\n";
     std::cout << "3. Admin: Create Checking Account\n";
     std::cout << "4. Admin: Create Savings Account\n";
-    std::cout << "5. Client: Deposit to Account\n";
-    std::cout << "6. Client: Withdraw from Account\n";
+    std::cout << "5. Admin: View All Accounts\n";
+    std::cout << "6. Client: Deposit to Account\n";
+    std::cout << "7. Client: Withdraw from Account\n";
+    std::cout << "8. Client: Transfer Funds\n";
     std::cout << "0. Exit\n";
     std::cout << "Select an option: ";
 }
@@ -75,6 +77,18 @@ void handleWithdraw(Bank& bank) {
     bank.withdrawFromAccount(accountNumber, amount);
 }
 
+void handleTransfer(Bank& bank) {
+    std::string fromAccount, toAccount;
+    double amount;
+    std::cout << "Enter Sender Account Number: ";
+    std::cin >> fromAccount;
+    std::cout << "Enter Receiver Account Number: ";
+    std::cin >> toAccount;
+    std::cout << "Enter Amount to Transfer: ";
+    std::cin >> amount;
+    bank.transfer(fromAccount, toAccount, amount);
+}
+
 int main() {
     Bank myBank;
     int choice = -1;
@@ -103,10 +117,16 @@ int main() {
                 handleCreateSavings(myBank);
                 break;
             case 5:
-                handleDeposit(myBank);
+                myBank.displayAllAccounts();
                 break;
             case 6:
+                handleDeposit(myBank);
+                break;
+            case 7:
                 handleWithdraw(myBank);
+                break;
+            case 8:
+                handleTransfer(myBank);
                 break;
             case 0:
                 std::cout << "Exiting system. Goodbye!\n";

@@ -79,3 +79,43 @@ void Bank::withdrawFromAccount(const std::string& accountNumber, double amount) 
         std::cout << "Error: Account number " << accountNumber << " not found.\n";
     }
 }
+
+void Bank::displayAllAccounts() const {
+    if (accounts.empty()) {
+        std::cout << "No accounts registered in the bank.\n";
+        return;
+    }
+    std::cout << "\n--- Bank Accounts ---\n";
+    for (const auto& acc : accounts) {
+        acc->displayAccountInfo();
+        std::cout << "---------------------\n";
+    }
+}
+
+void Bank::transfer(const std::string& fromAccount, const std::string& toAccount, double amount) {
+    if (amount <= 0) {
+        std::cout << "Invalid transfer amount.\n";
+        return;
+    }
+    
+    Account* sender = getAccount(fromAccount);
+    Account* receiver = getAccount(toAccount);
+    
+    if (!sender) {
+        std::cout << "Sender account " << fromAccount << " not found.\n";
+        return;
+    }
+    if (!receiver) {
+        std::cout << "Receiver account " << toAccount << " not found.\n";
+        return;
+    }
+    
+    std::cout << "Initiating transfer of $" << amount << " from " << fromAccount << " to " << toAccount << "...\n";
+    if (sender->withdraw(amount)) {
+        // If withdrawal is successful, deposit to receiver
+        receiver->deposit(amount);
+        std::cout << "Transfer complete.\n";
+    } else {
+        std::cout << "Transfer failed due to sender's withdrawal limits.\n";
+    }
+}
