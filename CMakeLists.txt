@@ -10,4 +10,7 @@ include_directories(include)
 # Executable output
 add_executable(BankingSystem 
     src/main.cpp
+    src/Person.cpp
+    src/Client.cpp
+    src/Bank.cpp
 )
