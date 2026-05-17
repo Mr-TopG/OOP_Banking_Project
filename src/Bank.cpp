@@ -70,3 +70,12 @@ void Bank::depositToAccount(const std::string& accountNumber, double amount) {
         std::cout << "Error: Account number " << accountNumber << " not found.\n";
     }
 }
+
+void Bank::withdrawFromAccount(const std::string& accountNumber, double amount) {
+    Account* acc = getAccount(accountNumber);
+    if (acc) {
+        acc->withdraw(amount); // This uses dynamic polymorphism to call the correct withdraw logic
+    } else {
+        std::cout << "Error: Account number " << accountNumber << " not found.\n";
+    }
+}

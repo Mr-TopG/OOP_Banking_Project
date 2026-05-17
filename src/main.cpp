@@ -9,6 +9,7 @@ void displayMenu() {
     std::cout << "3. Admin: Create Checking Account\n";
     std::cout << "4. Admin: Create Savings Account\n";
     std::cout << "5. Client: Deposit to Account\n";
+    std::cout << "6. Client: Withdraw from Account\n";
     std::cout << "0. Exit\n";
     std::cout << "Select an option: ";
 }
@@ -64,6 +65,16 @@ void handleDeposit(Bank& bank) {
     bank.depositToAccount(accountNumber, amount);
 }
 
+void handleWithdraw(Bank& bank) {
+    std::string accountNumber;
+    double amount;
+    std::cout << "Enter Account Number (e.g., CHK1000 or SAV1001): ";
+    std::cin >> accountNumber;
+    std::cout << "Enter Amount to Withdraw: ";
+    std::cin >> amount;
+    bank.withdrawFromAccount(accountNumber, amount);
+}
+
 int main() {
     Bank myBank;
     int choice = -1;
@@ -93,6 +104,9 @@ int main() {
                 break;
             case 5:
                 handleDeposit(myBank);
+                break;
+            case 6:
+                handleWithdraw(myBank);
                 break;
             case 0:
                 std::cout << "Exiting system. Goodbye!\n";

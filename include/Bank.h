@@ -32,6 +32,7 @@ public:
     // Financial Operations
     Account* getAccount(const std::string& accountNumber);
     void depositToAccount(const std::string& accountNumber, double amount);
+    void withdrawFromAccount(const std::string& accountNumber, double amount);
 };
 
 #endif // BANK_H
