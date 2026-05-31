@@ -44,3 +44,7 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
+
+# Testing and Data
+test.sh
+bank_data.txt

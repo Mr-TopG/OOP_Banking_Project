@@ -60,5 +60,3 @@ public:
 };
 
 #endif // BANK_H
-
-#endif // BANK_H
