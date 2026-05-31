@@ -114,7 +114,10 @@ void Bank::transfer(const std::string& fromAccount, const std::string& toAccount
     }
     
     std::cout << "Initiating transfer of $" << amount << " from " << fromAccount << " to " << toAccount << "...\n";
-    if (transactions.emplace_back("TRANSFER", amount, fromAccount, toAccount);
+    if (sender->withdraw(amount)) {
+        // If withdrawal is successful, deposit to receiver
+        receiver->deposit(amount);
+        transactions.emplace_back("TRANSFER", amount, fromAccount, toAccount);
         std::cout << "Transfer complete.\n";
     } else {
         std::cout << "Transfer failed due to sender's withdrawal limits.\n";
@@ -158,9 +161,6 @@ void Bank::displayAllLoans() const {
     }
     std::cout << "\n--- Active Loans ---\n";
     for (const auto& loan : loans) {
-        loan.displayLoanInfo()
-        std::cout << "Transfer complete.\n";
-    } else {
-        std::cout << "Transfer failed due to sender's withdrawal limits.\n";
+        loan.displayLoanInfo();
     }
 }
