@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 Bank::Bank() {
     // Initialize a default system admin so we can login later
@@ -18,29 +19,24 @@ void Bank::createAdmin(const std::string& firstName, const std::string& lastName
 }
 
 Admin* Bank::authenticateAdmin(int id, const std::string& password) {
-    for (auto& admin : admins) {
-        if (admin.getId() == id && admin.getPassword() == password) {
-            return &admin;
-        }
-    }
-    return nullptr;
+    auto it = std::find_if(admins.begin(), admins.end(), [id, &password](const Admin& admin) {
+        return admin.getId() == id && admin.getPassword() == password;
+    });
+    return it != admins.end() ? &(*it) : nullptr;
 }
 
 void Bank::createClient(const std::string& firstName, const std::string& lastName, 
                         const std::string& password, const std::string& address, 
                         const std::string& phoneNumber) {
-    Client newClient(nextClientId++, firstName, lastName, password, address, phoneNumber);
-    clients.push_back(newClient);
-    std::cout << "Client " << firstName << " " << lastName << " created successfully with ID: " << newClient.getId() << "\n";
+    clients.emplace_back(nextClientId++, firstName, lastName, password, address, phoneNumber);
+    std::cout << "Client " << firstName << " " << lastName << " created successfully with ID: " << clients.back().getId() << "\n";
 }
 
 Client* Bank::getClient(int id) {
-    for (auto& client : clients) {
-        if (client.getId() == id) {
-            return &client;
-        }
-    }
-    return nullptr;
+    auto it = std::find_if(clients.begin(), clients.end(), [id](const Client& client) {
+        return client.getId() == id;
+    });
+    return it != clients.end() ? &(*it) : nullptr;
 }
 
 void Bank::displayAllClients() const {
@@ -79,12 +75,10 @@ void Bank::createSavingsAccount(int clientId, double initialBalance, double rate
 }
 
 Account* Bank::getAccount(const std::string& accountNumber) {
-    for (auto& acc : accounts) {
-        if (acc->getAccountNumber() == accountNumber) {
-            return acc.get();
-        }
-    }
-    return nullptr;
+    auto it = std::find_if(accounts.begin(), accounts.end(), [&accountNumber](const std::unique_ptr<Account>& acc) {
+        return acc->getAccountNumber() == accountNumber;
+    });
+    return it != accounts.end() ? it->get() : nullptr;
 }
 
 void Bank::depositToAccount(const std::string& accountNumber, double amount) {
@@ -250,15 +244,18 @@ void Bank::loadData() {
     
     std::string line;
     int size;
+    std::vector<std::string> tokens;
+    tokens.reserve(10); // Reserve to avoid reallocation
 
     // Load Clients
     if (in >> size) {
+        clients.reserve(size);
         in.ignore();
         for (int i = 0; i < size; ++i) {
             std::getline(in, line);
             std::stringstream ss(line);
             std::string token;
-            std::vector<std::string> tokens;
+            tokens.clear();
             while(std::getline(ss, token, ',')) tokens.push_back(token);
             if (tokens.size() == 6) {
                 clients.emplace_back(std::stoi(tokens[0]), tokens[1], tokens[2], tokens[3], tokens[4], tokens[5]);
@@ -269,12 +266,13 @@ void Bank::loadData() {
 
     // Load Accounts
     if (in >> size) {
+        accounts.reserve(size);
         in.ignore();
         for (int i = 0; i < size; ++i) {
             std::getline(in, line);
             std::stringstream ss(line);
             std::string token;
-            std::vector<std::string> tokens;
+            tokens.clear();
             while(std::getline(ss, token, ',')) tokens.push_back(token);
             if (tokens.size() >= 5) {
                 if (tokens[0] == "CHK") {
@@ -292,12 +290,13 @@ void Bank::loadData() {
 
     // Load Loans
     if (in >> size) {
+        loans.reserve(size);
         in.ignore();
         for (int i = 0; i < size; ++i) {
             std::getline(in, line);
             std::stringstream ss(line);
             std::string token;
-            std::vector<std::string> tokens;
+            tokens.clear();
             while(std::getline(ss, token, ',')) tokens.push_back(token);
             if (tokens.size() == 5) {
                 loans.emplace_back(std::stoi(tokens[0]), std::stoi(tokens[1]), std::stod(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
@@ -308,12 +307,13 @@ void Bank::loadData() {
 
     // Load Transactions
     if (in >> size) {
+        transactions.reserve(size);
         in.ignore();
         for (int i = 0; i < size; ++i) {
             std::getline(in, line);
             std::stringstream ss(line);
             std::string token;
-            std::vector<std::string> tokens;
+            tokens.clear();
             while(std::getline(ss, token, ',')) tokens.push_back(token);
             if (tokens.size() == 6) {
                 std::string dest = tokens[5] == "NONE" ? "" : tokens[5];
@@ -321,7 +321,7 @@ void Bank::loadData() {
             }
         }
     }
-    
+
     in.close();
     std::cout << "Data loaded successfully from bank_data.txt\n";
 }
