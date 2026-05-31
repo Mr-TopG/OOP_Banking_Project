@@ -3,6 +3,27 @@
 #include "SavingsAccount.h"
 #include <iostream>
 
+Bank::Bank() {
+    // Initialize a default system admin so we can login later
+    createAdmin("System", "Admin", "admin123", "Root");
+}
+
+void Bank::createAdmin(const std::string& firstName, const std::string& lastName, 
+                       const std::string& password, const std::string& role) {
+    Admin newAdmin(nextAdminId++, firstName, lastName, password, role);
+    admins.push_back(newAdmin);
+    std::cout << "Admin " << firstName << " " << lastName << " created successfully with ID: " << newAdmin.getId() << "\n";
+}
+
+Admin* Bank::authenticateAdmin(int id, const std::string& password) {
+    for (auto& admin : admins) {
+        if (admin.getId() == id && admin.getPassword() == password) {
+            return &admin;
+        }
+    }
+    return nullptr;
+}
+
 void Bank::createClient(const std::string& firstName, const std::string& lastName, 
                         const std::string& password, const std::string& address, 
                         const std::string& phoneNumber) {

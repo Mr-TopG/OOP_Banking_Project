@@ -2,6 +2,7 @@
 #define BANK_H
 
 #include "Client.h"
+#include "Admin.h"
 #include "Account.h"
 #include "Transaction.h"
 #include "Loan.h"
@@ -12,14 +13,21 @@
 class Bank {
 private:
     std::vector<Client> clients;
+    std::vector<Admin> admins;
     std::vector<std::unique_ptr<Account>> accounts; // Store Abstract Accounts safely
     std::vector<Transaction> transactions;
     std::vector<Loan> loans;
     int nextClientId = 1;
+    int nextAdminId = 1;
     int nextAccountNumber = 1000;
 
 public:
-    Bank() = default;
+    Bank(); // Add constructor to initialize default admin
+
+    // Admin array management
+    void createAdmin(const std::string& firstName, const std::string& lastName, 
+                     const std::string& password, const std::string& role);
+    Admin* authenticateAdmin(int id, const std::string& password);
 
     // Client Management
     void createClient(const std::string& firstName, const std::string& lastName, 
