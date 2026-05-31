@@ -53,6 +53,12 @@ public:
     void depositToAccount(const std::string& accountNumber, double amount);
     void withdrawFromAccount(const std::string& accountNumber, double amount);
     void transfer(const std::string& fromAccount, const std::string& toAccount, double amount);
+    
+    // File Persistence
+    void saveData() const;
+    void loadData();
 };
+
+#endif // BANK_H
 
 #endif // BANK_H

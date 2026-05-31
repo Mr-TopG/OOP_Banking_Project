@@ -12,10 +12,13 @@ private:
 
 public:
     Loan(int clientId, double principal, double interestRate);
+    Loan(int loanId, int clientId, double principal, double interestRate, double remainingBalance); // for loading from file
     
     // Getters
     int getLoanId() const;
     int getClientId() const;
+    double getPrincipal() const;
+    double getInterestRate() const;
     double getRemainingBalance() const;
 
     // Financial operations

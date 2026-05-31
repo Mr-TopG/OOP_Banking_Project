@@ -14,6 +14,20 @@ Transaction::Transaction(const std::string& type, double amount, const std::stri
     timestamp = buf;
 }
 
+Transaction::Transaction(int id, const std::string& type, double amount, const std::string& timestamp, const std::string& sourceAccount, const std::string& destAccount)
+    : transactionId(id), type(type), amount(amount), timestamp(timestamp), sourceAccount(sourceAccount), destAccount(destAccount) {
+    if (id >= nextTransactionId) {
+        nextTransactionId = id + 1;
+    }
+}
+
+int Transaction::getTransactionId() const { return transactionId; }
+std::string Transaction::getType() const { return type; }
+double Transaction::getAmount() const { return amount; }
+std::string Transaction::getTimestamp() const { return timestamp; }
+std::string Transaction::getSourceAccount() const { return sourceAccount; }
+std::string Transaction::getDestAccount() const { return destAccount; }
+
 void Transaction::displayTransaction() const {
     std::cout << "[" << timestamp << "] ID: " << transactionId 
               << " | " << type << " | Amount: $" << amount 

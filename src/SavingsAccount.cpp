@@ -4,6 +4,8 @@
 SavingsAccount::SavingsAccount(const std::string& accountNumber, int clientId, double initialBalance, double rate)
     : Account(accountNumber, clientId, initialBalance), interestRate(rate) {}
 
+double SavingsAccount::getInterestRate() const { return interestRate; }
+
 bool SavingsAccount::withdraw(double amount) {
     if (amount <= 0) {
         std::cout << "Invalid withdrawal amount.\n";

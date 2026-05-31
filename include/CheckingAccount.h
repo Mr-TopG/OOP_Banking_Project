@@ -10,6 +10,9 @@ private:
 public:
     CheckingAccount(const std::string& accountNumber, int clientId, double initialBalance, double limit);
     
+    // Getters
+    double getOverdraftLimit() const;
+
     // Financial operations implementations
     bool withdraw(double amount) override;
     void displayAccountInfo() const override;

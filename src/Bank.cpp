@@ -2,6 +2,8 @@
 #include "CheckingAccount.h"
 #include "SavingsAccount.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 Bank::Bank() {
     // Initialize a default system admin so we can login later
@@ -184,4 +186,134 @@ void Bank::displayAllLoans() const {
     for (const auto& loan : loans) {
         loan.displayLoanInfo();
     }
+}
+
+void Bank::saveData() const {
+    std::ofstream out("bank_data.txt");
+    if (!out) {
+        std::cout << "Error opening file to save data.\n";
+        return;
+    }
+    
+    // Save Clients
+    out << clients.size() << "\n";
+    for (const auto& c : clients) {
+        out << c.getId() << "," << c.getFirstName() << "," << c.getLastName() << "," 
+            << c.getPassword() << "," << c.getAddress() << "," << c.getPhoneNumber() << "\n";
+    }
+
+    // Save Accounts (Identifying typings)
+    out << accounts.size() << "\n";
+    for (const auto& acc : accounts) {
+        if (auto* chk = dynamic_cast<CheckingAccount*>(acc.get())) {
+            out << "CHK," << chk->getAccountNumber() << "," << chk->getClientId() << "," 
+                << chk->getBalance() << "," << chk->getOverdraftLimit() << "\n";
+        } else if (auto* sav = dynamic_cast<SavingsAccount*>(acc.get())) {
+            out << "SAV," << sav->getAccountNumber() << "," << sav->getClientId() << "," 
+                << sav->getBalance() << "," << sav->getInterestRate() << "\n";
+        }
+    }
+
+    // Save Loans
+    out << loans.size() << "\n";
+    for (const auto& ln : loans) {
+        out << ln.getLoanId() << "," << ln.getClientId() << "," << ln.getPrincipal() << "," 
+            << ln.getInterestRate() << "," << ln.getRemainingBalance() << "\n";
+    }
+    
+    // Save Transactions
+    out << transactions.size() << "\n";
+    for (const auto& tx : transactions) {
+        out << tx.getTransactionId() << "," << tx.getType() << "," << tx.getAmount() << "," 
+            << tx.getTimestamp() << "," << tx.getSourceAccount() << "," 
+            << (tx.getDestAccount().empty() ? "NONE" : tx.getDestAccount()) << "\n";
+    }
+    
+    out.close();
+    std::cout << "Data saved successfully to bank_data.txt\n";
+}
+
+void Bank::loadData() {
+    std::ifstream in("bank_data.txt");
+    if (!in) {
+        std::cout << "No existing bank_data.txt found. Starting fresh.\n";
+        return;
+    }
+    
+    clients.clear();
+    accounts.clear();
+    loans.clear();
+    transactions.clear();
+    
+    std::string line;
+    int size;
+
+    // Load Clients
+    if (in >> size) {
+        in.ignore();
+        for (int i = 0; i < size; ++i) {
+            std::getline(in, line);
+            std::stringstream ss(line);
+            std::string token;
+            std::vector<std::string> tokens;
+            while(std::getline(ss, token, ',')) tokens.push_back(token);
+            if (tokens.size() == 6) {
+                clients.emplace_back(std::stoi(tokens[0]), tokens[1], tokens[2], tokens[3], tokens[4], tokens[5]);
+                if (std::stoi(tokens[0]) >= nextClientId) nextClientId = std::stoi(tokens[0]) + 1;
+            }
+        }
+    }
+
+    // Load Accounts
+    if (in >> size) {
+        in.ignore();
+        for (int i = 0; i < size; ++i) {
+            std::getline(in, line);
+            std::stringstream ss(line);
+            std::string token;
+            std::vector<std::string> tokens;
+            while(std::getline(ss, token, ',')) tokens.push_back(token);
+            if (tokens.size() >= 5) {
+                if (tokens[0] == "CHK") {
+                    accounts.push_back(std::make_unique<CheckingAccount>(tokens[1], std::stoi(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4])));
+                } else if (tokens[0] == "SAV") {
+                    accounts.push_back(std::make_unique<SavingsAccount>(tokens[1], std::stoi(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4])));
+                }
+            }
+        }
+    }
+
+    // Load Loans
+    if (in >> size) {
+        in.ignore();
+        for (int i = 0; i < size; ++i) {
+            std::getline(in, line);
+            std::stringstream ss(line);
+            std::string token;
+            std::vector<std::string> tokens;
+            while(std::getline(ss, token, ',')) tokens.push_back(token);
+            if (tokens.size() == 5) {
+                loans.emplace_back(std::stoi(tokens[0]), std::stoi(tokens[1]), std::stod(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
+            }
+        }
+    }
+
+    // Load Transactions
+    if (in >> size) {
+        in.ignore();
+        for (int i = 0; i < size; ++i) {
+            std::getline(in, line);
+            std::stringstream ss(line);
+            std::string token;
+            std::vector<std::string> tokens;
+            while(std::getline(ss, token, ',')) tokens.push_back(token);
+            if (tokens.size() == 6) {
+                std::string dest = tokens[5] == "NONE" ? "" : tokens[5];
+                transactions.emplace_back(std::stoi(tokens[0]), tokens[1], std::stod(tokens[2]), tokens[3], tokens[4], dest);
+            }
+        }
+    }
+    
+    in.close();
+    std::cout << "Data loaded successfully from bank_data.txt\n";
 }

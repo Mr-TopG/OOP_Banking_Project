@@ -4,6 +4,8 @@
 CheckingAccount::CheckingAccount(const std::string& accountNumber, int clientId, double initialBalance, double limit)
     : Account(accountNumber, clientId, initialBalance), overdraftLimit(limit) {}
 
+double CheckingAccount::getOverdraftLimit() const { return overdraftLimit; }
+
 bool CheckingAccount::withdraw(double amount) {
     if (amount <= 0) {
         std::cout << "Invalid withdrawal amount.\n";

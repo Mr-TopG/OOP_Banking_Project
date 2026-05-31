@@ -7,8 +7,17 @@ Loan::Loan(int clientId, double principal, double interestRate)
     : loanId(nextLoanId++), clientId(clientId), principal(principal), 
       interestRate(interestRate), remainingBalance(principal) {}
 
+Loan::Loan(int loanId, int clientId, double principal, double interestRate, double remainingBalance)
+    : loanId(loanId), clientId(clientId), principal(principal), interestRate(interestRate), remainingBalance(remainingBalance) {
+    if (loanId >= nextLoanId) {
+        nextLoanId = loanId + 1;
+    }
+}
+
 int Loan::getLoanId() const { return loanId; }
 int Loan::getClientId() const { return clientId; }
+double Loan::getPrincipal() const { return principal; }
+double Loan::getInterestRate() const { return interestRate; }
 double Loan::getRemainingBalance() const { return remainingBalance; }
 
 void Loan::makePayment(double amount) {
