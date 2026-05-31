@@ -16,4 +16,6 @@ add_executable(BankingSystem
     src/Account.cpp
     src/CheckingAccount.cpp
     src/SavingsAccount.cpp
+    src/Transaction.cpp
+    src/Loan.cpp
 )

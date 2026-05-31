@@ -66,6 +66,7 @@ void Bank::depositToAccount(const std::string& accountNumber, double amount) {
     Account* acc = getAccount(accountNumber);
     if (acc) {
         acc->deposit(amount);
+        transactions.emplace_back("DEPOSIT", amount, accountNumber);
     } else {
         std::cout << "Error: Account number " << accountNumber << " not found.\n";
     }
@@ -74,7 +75,9 @@ void Bank::depositToAccount(const std::string& accountNumber, double amount) {
 void Bank::withdrawFromAccount(const std::string& accountNumber, double amount) {
     Account* acc = getAccount(accountNumber);
     if (acc) {
-        acc->withdraw(amount); // This uses dynamic polymorphism to call the correct withdraw logic
+        if (acc->withdraw(amount)) { // This uses dynamic polymorphism to call the correct withdraw logic
+            transactions.emplace_back("WITHDRAWAL", amount, accountNumber);
+        }
     } else {
         std::cout << "Error: Account number " << accountNumber << " not found.\n";
     }
@@ -111,9 +114,51 @@ void Bank::transfer(const std::string& fromAccount, const std::string& toAccount
     }
     
     std::cout << "Initiating transfer of $" << amount << " from " << fromAccount << " to " << toAccount << "...\n";
-    if (sender->withdraw(amount)) {
-        // If withdrawal is successful, deposit to receiver
-        receiver->deposit(amount);
+    if (transactions.emplace_back("TRANSFER", amount, fromAccount, toAccount);
+        std::cout << "Transfer complete.\n";
+    } else {
+        std::cout << "Transfer failed due to sender's withdrawal limits.\n";
+    }
+}
+
+void Bank::displayTransactions() const {
+    if (transactions.empty()) {
+        std::cout << "No transactions recorded yet.\n";
+        return;
+    }
+    std::cout << "\n--- Transaction History ---\n";
+    for (const auto& tx : transactions) {
+        tx.displayTransaction();
+    }
+}
+
+void Bank::requestLoan(int clientId, double principal, double rate) {
+    if (getClient(clientId) != nullptr) {
+        loans.emplace_back(clientId, principal, rate);
+        std::cout << "Loan approved and created for Client ID: " << clientId << ".\n";
+    } else {
+        std::cout << "Error: Client ID " << clientId << " not found.\n";
+    }
+}
+
+void Bank::payLoan(int loanId, double amount) {
+    for (auto& loan : loans) {
+        if (loan.getLoanId() == loanId) {
+            loan.makePayment(amount);
+            return;
+        }
+    }
+    std::cout << "Error: Loan ID " << loanId << " not found.\n";
+}
+
+void Bank::displayAllLoans() const {
+    if (loans.empty()) {
+        std::cout << "No active loans in the bank.\n";
+        return;
+    }
+    std::cout << "\n--- Active Loans ---\n";
+    for (const auto& loan : loans) {
+        loan.displayLoanInfo()
         std::cout << "Transfer complete.\n";
     } else {
         std::cout << "Transfer failed due to sender's withdrawal limits.\n";

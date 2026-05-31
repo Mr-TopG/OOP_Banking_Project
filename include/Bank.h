@@ -3,6 +3,8 @@
 
 #include "Client.h"
 #include "Account.h"
+#include "Transaction.h"
+#include "Loan.h"
 #include <vector>
 #include <memory>
 #include <string>
@@ -11,6 +13,8 @@ class Bank {
 private:
     std::vector<Client> clients;
     std::vector<std::unique_ptr<Account>> accounts; // Store Abstract Accounts safely
+    std::vector<Transaction> transactions;
+    std::vector<Loan> loans;
     int nextClientId = 1;
     int nextAccountNumber = 1000;
 
@@ -31,6 +35,12 @@ public:
     void displayAllAccounts() const;
     
     // Financial Operations
+    void displayTransactions() const;
+
+    // Loan Management
+    void requestLoan(int clientId, double principal, double rate);
+    void payLoan(int loanId, double amount);
+    void displayAllLoans() const;
     Account* getAccount(const std::string& accountNumber);
     void depositToAccount(const std::string& accountNumber, double amount);
     void withdrawFromAccount(const std::string& accountNumber, double amount);

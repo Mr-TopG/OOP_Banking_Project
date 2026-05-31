@@ -12,6 +12,10 @@ void displayMenu() {
     std::cout << "6. Client: Deposit to Account\n";
     std::cout << "7. Client: Withdraw from Account\n";
     std::cout << "8. Client: Transfer Funds\n";
+    std::cout << "9. Admin: View Transaction History\n";
+    std::cout << "10. Client: Request Loan\n";
+    std::cout << "11. Client: Pay Loan\n";
+    std::cout << "12. Admin: View All Loans\n";
     std::cout << "0. Exit\n";
     std::cout << "Select an option: ";
 }
@@ -89,6 +93,28 @@ void handleTransfer(Bank& bank) {
     bank.transfer(fromAccount, toAccount, amount);
 }
 
+void handleRequestLoan(Bank& bank) {
+    int clientId;
+    double principal, rate;
+    std::cout << "Enter Client ID: ";
+    std::cin >> clientId;
+    std::cout << "Enter Principal Amount: ";
+    std::cin >> principal;
+    std::cout << "Enter Interest Rate (%): ";
+    std::cin >> rate;
+    bank.requestLoan(clientId, principal, rate);
+}
+
+void handlePayLoan(Bank& bank) {
+    int loanId;
+    double amount;
+    std::cout << "Enter Loan ID: ";
+    std::cin >> loanId;
+    std::cout << "Enter Payment Amount: ";
+    std::cin >> amount;
+    bank.payLoan(loanId, amount);
+}
+
 int main() {
     Bank myBank;
     int choice = -1;
@@ -127,6 +153,18 @@ int main() {
                 break;
             case 8:
                 handleTransfer(myBank);
+                break;
+            case 9:
+                myBank.displayTransactions();
+                break;
+            case 10:
+                handleRequestLoan(myBank);
+                break;
+            case 11:
+                handlePayLoan(myBank);
+                break;
+            case 12:
+                myBank.displayAllLoans();
                 break;
             case 0:
                 std::cout << "Exiting system. Goodbye!\n";
