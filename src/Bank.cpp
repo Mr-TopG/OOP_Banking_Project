@@ -57,9 +57,10 @@ void Bank::displayAllClients() const {
 }
 
 void Bank::createCheckingAccount(int clientId, double initialBalance, double limit) {
-    if (getClient(clientId) != nullptr) {
+    if (Client* client = getClient(clientId)) {
         std::string accNum = "CHK" + std::to_string(nextAccountNumber++);
         accounts.push_back(std::make_unique<CheckingAccount>(accNum, clientId, initialBalance, limit));
+        client->addAccount(accNum);
         std::cout << "Checking Account created successfully: " << accNum << "\n";
     } else {
         std::cout << "Error: Client ID " << clientId << " not found.\n";
@@ -67,9 +68,10 @@ void Bank::createCheckingAccount(int clientId, double initialBalance, double lim
 }
 
 void Bank::createSavingsAccount(int clientId, double initialBalance, double rate) {
-    if (getClient(clientId) != nullptr) {
+    if (Client* client = getClient(clientId)) {
         std::string accNum = "SAV" + std::to_string(nextAccountNumber++);
         accounts.push_back(std::make_unique<SavingsAccount>(accNum, clientId, initialBalance, rate));
+        client->addAccount(accNum);
         std::cout << "Savings Account created successfully: " << accNum << "\n";
     } else {
         std::cout << "Error: Client ID " << clientId << " not found.\n";
@@ -159,8 +161,9 @@ void Bank::displayTransactions() const {
 }
 
 void Bank::requestLoan(int clientId, double principal, double rate) {
-    if (getClient(clientId) != nullptr) {
+    if (Client* client = getClient(clientId)) {
         loans.emplace_back(clientId, principal, rate);
+        client->addLoan(loans.back().getLoanId());
         std::cout << "Loan approved and created for Client ID: " << clientId << ".\n";
     } else {
         std::cout << "Error: Client ID " << clientId << " not found.\n";
@@ -275,9 +278,13 @@ void Bank::loadData() {
             while(std::getline(ss, token, ',')) tokens.push_back(token);
             if (tokens.size() >= 5) {
                 if (tokens[0] == "CHK") {
-                    accounts.push_back(std::make_unique<CheckingAccount>(tokens[1], std::stoi(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4])));
+                    auto acc = std::make_unique<CheckingAccount>(tokens[1], std::stoi(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
+                    if (Client* c = getClient(acc->getClientId())) c->addAccount(acc->getAccountNumber());
+                    accounts.push_back(std::move(acc));
                 } else if (tokens[0] == "SAV") {
-                    accounts.push_back(std::make_unique<SavingsAccount>(tokens[1], std::stoi(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4])));
+                    auto acc = std::make_unique<SavingsAccount>(tokens[1], std::stoi(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
+                    if (Client* c = getClient(acc->getClientId())) c->addAccount(acc->getAccountNumber());
+                    accounts.push_back(std::move(acc));
                 }
             }
         }
@@ -294,6 +301,7 @@ void Bank::loadData() {
             while(std::getline(ss, token, ',')) tokens.push_back(token);
             if (tokens.size() == 5) {
                 loans.emplace_back(std::stoi(tokens[0]), std::stoi(tokens[1]), std::stod(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
+                if (Client* c = getClient(std::stoi(tokens[1]))) c->addLoan(std::stoi(tokens[0]));
             }
         }
     }
